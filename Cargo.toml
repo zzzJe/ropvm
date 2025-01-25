@@ -1,0 +1,17 @@
+[package]
+name = "opvm"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reqwest = { version = "0.12", features = ["json"] }
+scraper = "0.22.0"
+tokio = { version = "1.43.0", features = ["full"] }
+futures = "0.3.31"
+regex = "1.11.1"
+clap = { version = "4.5.26", features = ["derive"] }
+clap-cargo = "0.15.1"
+indexmap = "2.7.0"
+sled = "0.34.7"
+chrono = "0.4.39"
+bincode = "1.3.3"
