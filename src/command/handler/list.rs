@@ -12,7 +12,7 @@ pub enum SortBy {
 }
 
 pub(super) async fn handler(
-    version: Option<String>,
+    pattern: Option<String>,
     load_order: bool,
     display_time: bool,
     sort_by: Option<SortBy>,
@@ -44,7 +44,7 @@ pub(super) async fn handler(
             Ok((k, v)) => Some((ivec_to_string(&k), ivec_to_string(&v))),
             Err(_) => None,
         })
-        .filter(|(k, _)| k.contains(version.as_deref().unwrap_or("")))
+        .filter(|(k, _)| k.contains(pattern.as_deref().unwrap_or("")))
         .collect();
     match sort_by {
         None | Some(SortBy::NameNew) => {

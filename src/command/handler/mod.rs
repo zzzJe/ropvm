@@ -9,14 +9,14 @@ mod remove;
 mod search;
 mod util;
 
-pub use list::SortBy as ListSortBy;
+pub(super) use list::SortBy as ListSortBy;
 
 #[allow(unused)]
 pub async fn command_handler(cli: Cli) {
     let cmd = cli.command;
     match cmd {
         Commands::Add { versions } => add::handler(versions).await,
-        Commands::Remove { versions } => {}
+        Commands::Remove { patterns } => remove::handler(patterns).await,
         Commands::Apply { version } => {}
         Commands::Config {
             minecraft_dir,
@@ -25,11 +25,11 @@ pub async fn command_handler(cli: Cli) {
             test,
         } => config::handler(minecraft_dir, java_path, repo_dir, test).await,
         Commands::List {
-            version,
+            pattern,
             load_order,
             time,
             by,
-        } => list::handler(version, load_order, time, by).await,
+        } => list::handler(pattern, load_order, time, by).await,
         Commands::Load => load::handler().await,
         Commands::Search { version } => search::handler(version).await,
     }

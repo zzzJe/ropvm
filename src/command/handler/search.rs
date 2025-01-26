@@ -1,7 +1,4 @@
-use crate::{
-    scrape::Scraper,
-    db::Database,
-};
+use crate::{db::Database, scrape::Scraper};
 
 pub(super) async fn handler(version: Option<String>) {
     let scrape = Scraper::new().await;

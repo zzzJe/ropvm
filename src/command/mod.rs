@@ -39,19 +39,15 @@ enum Commands {
     /// Remove an Optifine version from local
     Remove {
         #[arg(help = "\
-            Some local Minecraft versions, or specific Optifine versions\n\
-            Version can be:\n\
-            * Minecraft Version[Index Range]\n  \
-              - 1.16.5[1]\n  \
-              - 1.16.5[1~2]\n  \
-              - 1.16.5[~]\n\
-            * Minecraft Version\n  \
-              - 1.16.5 (= 1.16.5[~])\n  \
-              - 1.20.4 (= 1.20.4[~])\n\
-            * Optifine Version\n  \
-              - 1.16.5_HD_U_G8\
+            Some local Optifine versions pattern\n\
+            Pattern can be:\n\
+            * Complete Optifine Version\n\
+            * Partial Optifine Version (delete all version that contain this pattern)\n\
+            * Minecraft Version (delete all version of that Minecraft version)\n\
+            * Any name\n\
+            * \"\" (empty string) (meaning delete all files)\n\
         ")]
-        versions: Vec<String>,
+        patterns: Vec<String>,
     },
     /// Apply an Optifine Setting GUI
     Apply {
@@ -78,7 +74,7 @@ enum Commands {
     /// List an Optifine versions
     List {
         #[arg(help = "Empty or a pattern")]
-        version: Option<String>,
+        pattern: Option<String>,
         #[arg(short, long, help = "Force to load version order")]
         load_order: bool,
         #[arg(short, long, help = "Display download time")]
