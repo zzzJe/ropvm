@@ -16,7 +16,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Add an Optifine version to local
+    /// Add Optifine version(s) into local repo
     Add {
         #[arg(help = "\
             Some Minecraft versions, or some specific Optifine versions\n\
@@ -36,7 +36,7 @@ enum Commands {
         ")]
         versions: Vec<String>,
     },
-    /// Remove an Optifine version from local
+    /// Remove Optifine version(s) from local repo
     Remove {
         #[arg(help = "\
             Some local Optifine versions pattern\n\
@@ -50,7 +50,7 @@ enum Commands {
         patterns: Vec<String>,
     },
     // TODO?: Minecraft Version = Minecraft Version[1]
-    /// Apply an Optifine Setting GUI
+    /// Apply Optifine by opening setting GUI
     Apply {
         #[arg(help = "\
             A local Minecraft version, or specific Optifine version\n\
@@ -71,7 +71,7 @@ enum Commands {
         #[arg(short, long, help = "Validate config fields correctness")]
         test: bool,
     },
-    /// List an Optifine versions
+    /// List downloaded Optifine versions
     List {
         #[arg(help = "Empty or a pattern")]
         pattern: Option<String>,
@@ -82,11 +82,11 @@ enum Commands {
         #[arg(short, long, help = "Version display order")]
         by: Option<handler::ListSortBy>,
     },
-    /// Search for avaliable Optifine version
+    /// Search for avaliable Optifine versions
     Search {
         #[arg(help = "Empty or a Minecraft version")]
         version: Option<String>,
     },
-    /// Load files in local repo
+    /// Load all Optifine files in configured local repo
     Load,
 }
