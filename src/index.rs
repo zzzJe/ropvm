@@ -30,7 +30,7 @@ pub fn parse(raw_index: &str, boundary: usize) -> (Vec<ParsedRange>, Vec<(String
     for index in indices {
         let result = if num_re.is_match(index) {
             let num: usize = index.parse().unwrap();
-            if num > boundary {
+            if num > boundary || num == 0 {
                 ParsedRange::Invalid(index, format!("Range should between 1~{boundary}"))
             } else {
                 ParsedRange::Single(num)
@@ -83,4 +83,15 @@ pub fn purify(valid_ranges: Vec<ParsedRange>, boundary: usize) -> IndexSet<usize
         }
     }
     result
+}
+pub fn destruct_input(with_index: &str) -> Option<(String, String)> {
+    let re = Regex::new(r"(.+)\[(.*)\]").unwrap();
+    if re.is_match(with_index) {
+        let capture = re.captures(with_index).unwrap();
+        let mc_ver = capture.get(1).unwrap().as_str().to_string();
+        let index = capture.get(2).unwrap().as_str().to_string();
+        Some((mc_ver, index))
+    } else {
+        None
+    }
 }

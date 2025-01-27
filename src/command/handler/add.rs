@@ -1,11 +1,10 @@
 use super::util::get_current_time;
 use crate::{
     db::{ivec_to_string, Database, Tree},
-    index::{parse, purify},
+    index::{destruct_input, parse, purify},
     scrape::Scraper,
 };
 use indexmap::IndexSet;
-use regex::Regex;
 use std::path::Path;
 
 pub(super) async fn handler(versions: Vec<String>) {
@@ -128,16 +127,4 @@ pub(super) async fn handler(versions: Vec<String>) {
     cache_db
         .insert("all_opt_ver", all_opt_vers_serial)
         .expect("Failed to insert Optifine version into database");
-}
-
-fn destruct_input(with_index: &str) -> Option<(String, String)> {
-    let re = Regex::new(r"(.+)\[(.*)\]").unwrap();
-    if re.is_match(with_index) {
-        let capture = re.captures(with_index).unwrap();
-        let mc_ver = capture.get(1).unwrap().as_str().to_string();
-        let index = capture.get(2).unwrap().as_str().to_string();
-        Some((mc_ver, index))
-    } else {
-        None
-    }
 }

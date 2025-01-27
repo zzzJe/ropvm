@@ -49,14 +49,14 @@ enum Commands {
         ")]
         patterns: Vec<String>,
     },
+    // TODO?: Minecraft Version = Minecraft Version[1]
     /// Apply an Optifine Setting GUI
     Apply {
         #[arg(help = "\
             A local Minecraft version, or specific Optifine version\n\
             Version can be:\n\
-            * Minecraft Version[Index Range]\n\
-            * Minecraft Version (= Minecraft Version[1])\n\
-            * Optifine Version\
+            * Minecraft Version[Index]\n\
+            * Pattern (can be Optifine Version)\n\
         ")]
         version: String,
     },

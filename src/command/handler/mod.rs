@@ -11,13 +11,12 @@ mod util;
 
 pub(super) use list::SortBy as ListSortBy;
 
-#[allow(unused)]
 pub async fn command_handler(cli: Cli) {
     let cmd = cli.command;
     match cmd {
         Commands::Add { versions } => add::handler(versions).await,
         Commands::Remove { patterns } => remove::handler(patterns).await,
-        Commands::Apply { version } => {}
+        Commands::Apply { version } => apply::handler(version).await,
         Commands::Config {
             minecraft_dir,
             java_path,
