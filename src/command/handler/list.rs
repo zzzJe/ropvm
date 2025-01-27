@@ -37,14 +37,26 @@ pub(super) async fn handler(
         .filter(|(k, _)| k.contains(pattern.as_deref().unwrap_or("")))
         .collect();
     let vers = sort_vers(vers_unsorted, &cache_db, sort_by.unwrap_or(SortBy::NameNew));
+    let applied_ver = cache_db
+        .get("applied_ver")
+        .expect("Failed to get applied version in db")
+        .map(|ivec| ivec_to_string(&ivec));
     if display_time {
         let max_key_len = vers.iter().map(|e| e.0.len()).max().unwrap_or_default();
         for (k, v) in vers.iter() {
-            println!("   {} {} {}", k, ".".repeat(max_key_len - k.len() + 3), v);
+            let pointing = matches!(applied_ver, Some(ref v) if v == k);
+            println!(
+                "{} {} {} {}",
+                if pointing { "👉" } else { "  " },
+                k,
+                ".".repeat(max_key_len - k.len() + 3),
+                v
+            );
         }
     } else {
         for (k, _) in vers.iter() {
-            println!("   {}", k);
+            let pointing = matches!(applied_ver, Some(ref v) if v == k);
+            println!("{} {}", if pointing { "👉" } else { "  " }, k);
         }
     }
 }
