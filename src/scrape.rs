@@ -108,12 +108,12 @@ impl Scraper {
     }
     pub fn get_opt_vers(&self, mc_ver: &str) -> &[String] {
         if self.opt_ver.borrow().get(mc_ver).is_none() {
-            let filter_re = Regex::new(mc_ver).unwrap();
+            let mc_ver_head_pat = format!("{mc_ver}_");
             let result = self
                 .get_all_opt_vers()
                 .iter()
-                .filter(|e| filter_re.is_match(e))
-                .map(|e| e.to_string())
+                .filter(|s| s[..].starts_with(&mc_ver_head_pat))
+                .map(|s| s.to_string())
                 .collect();
             self.opt_ver.borrow_mut().insert(mc_ver.to_string(), result);
         }
