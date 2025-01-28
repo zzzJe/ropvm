@@ -39,7 +39,7 @@ enum Commands {
     /// Remove Optifine version(s) from local repo
     Remove {
         #[arg(help = "\
-            Some local Optifine versions pattern\n\
+            Some local Optifine version patterns\n\
             Pattern can be:\n\
             * Complete Optifine Version\n\
             * Partial Optifine Version (delete all version that contain this pattern)\n\
@@ -53,10 +53,14 @@ enum Commands {
     /// Apply Optifine by opening setting GUI
     Apply {
         #[arg(help = "\
-            A local Minecraft version, or specific Optifine version\n\
-            Version can be:\n\
-            * Minecraft Version[Index]\n\
-            * Pattern (can be Optifine Version)\n\
+            A local Minecraft version with index, or a pattern\n\
+            Minecraft version with index can be:\n\
+            * 1.20.4[] = (1.20.4[1])\n\
+            * 1.8.9[5]\n\
+            Pattern can be:\n\
+            * Any name\n\
+            * Custom name\n\
+            * An Optifine version\n\
         ")]
         version: String,
     },
@@ -66,7 +70,7 @@ enum Commands {
         minecraft_dir: Option<String>,
         #[arg(short, long, help = "Java machine(executable) path")]
         java_path: Option<String>,
-        #[arg(short, long, help = "Local repo to store Optifine files")]
+        #[arg(short, long, help = "File folder to store Optifine files")]
         repo_dir: Option<String>,
         #[arg(short, long, help = "Validate config fields correctness")]
         test: bool,

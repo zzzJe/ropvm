@@ -10,6 +10,8 @@ use tokio::{
     process::Command,
 };
 
+const TEST_JAR: &'static [u8] = include_bytes!("../../../test_resources/java/Test.jar");
+
 pub(super) async fn handler(
     minecraft_dir: Option<String>,
     java_path: Option<String>,
@@ -181,6 +183,10 @@ fn config_java(db: Tree, java_path: &String) -> db::Result<()> {
 async fn test_java(db: Tree) -> Result<String, String> {
     let entry = db.get("java_path").unwrap();
 
+    create_test_jar_and_dir_if_not_exist()
+        .await
+        .map_err(|_| "Failed to create .test_resources/Test.jar".to_string())?;
+
     if let Some(java) = entry {
         let java = ivec_to_string(&java);
         let status = open_process_to_test_java(&java).await;
@@ -197,10 +203,19 @@ async fn test_java(db: Tree) -> Result<String, String> {
     }
 }
 
+async fn create_test_jar_and_dir_if_not_exist() -> Result<(), std::io::Error> {
+    let filepath = Path::new(".test_resources/Test.jar");
+    fs::create_dir_all(".test_resources").await?;
+    if !filepath.exists() {
+        fs::write(filepath, TEST_JAR).await?;
+    }
+    Ok(())
+}
+
 async fn open_process_to_test_java(java: &str) -> Result<Result<ExitStatus, ()>, std::io::Error> {
     let mut child = Command::new(java)
         .arg("-jar")
-        .arg("./testing/java/Test.jar")
+        .arg(".test_resources/Test.jar")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()?;

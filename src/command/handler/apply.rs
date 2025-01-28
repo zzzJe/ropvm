@@ -57,13 +57,21 @@ pub(super) async fn handler(version: String) {
     match to_apply {
         Some(ver) => {
             let result = invoke_gui_and_check(&conf_db, &ver).await;
-            if result.is_ok() {
+            if let Err(err) = result {
+                println!("🛑 {ver} failed to apply!");
+                let reason = match err {
+                    InvokeError::ExitFail => "Optifine exit abnormally",
+                    InvokeError::InvokeFail => "faild to invoke process to open GUI",
+                    InvokeError::UserCancel => "user cancel",
+                    InvokeError::McDirNotFound => "minecraft-dir has not been configured",
+                    InvokeError::LauncherProfileRead => "failed to read 'launcher_profile.json'",
+                };
+                println!("   👉 {reason}");
+            } else {
                 println!("✅ {ver} success!");
                 cache_db
                     .insert("applied_ver", ver.as_bytes())
                     .expect("Failed to write applied version into db");
-            } else {
-                println!("🛑 {ver} failed to apply!");
             }
         }
         None => {
@@ -91,6 +99,8 @@ async fn invoke_gui_and_check(conf_db: &Tree, ver: &str) -> Result<(), InvokeErr
         .map(|ivec| ivec_to_string(&ivec))
         .unwrap_or("repo".to_string());
     let path = Path::new(&repo).join(ver);
+
+    let profile_before = get_launcher_profile(&launcher_profile_path).await?;
     let mut child = Command::new(java)
         .arg("-jar")
         .arg(path)
@@ -98,8 +108,6 @@ async fn invoke_gui_and_check(conf_db: &Tree, ver: &str) -> Result<(), InvokeErr
         .stdout(Stdio::null())
         .spawn()
         .map_err(|_| InvokeError::InvokeFail)?;
-
-    let profile_before = get_launcher_profile(&launcher_profile_path).await?;
     let status = child.wait().await.map_err(|_| InvokeError::InvokeFail)?;
     let profile_after = get_launcher_profile(&launcher_profile_path).await?;
 

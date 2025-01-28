@@ -9,7 +9,7 @@ pub struct Database {
 
 impl Database {
     pub fn new() -> Self {
-        let db = sled::open("db").expect("Failed to open database");
+        let db = sled::open(".db").expect("Failed to open database");
         let config_tree = db
             .open_tree("config")
             .expect("Failed to open database:config");

@@ -14,7 +14,7 @@ pub(super) fn sort_vers(
 ) -> Vec<(String, String)> {
     let order_from_db = cache_db.get("all_opt_ver").unwrap().unwrap_or_default();
     let order: HashMap<String, usize> = bincode::deserialize::<Vec<String>>(&order_from_db)
-        .unwrap()
+        .unwrap_or_default()
         .into_iter()
         .enumerate()
         .map(|(i, s)| (s, i))
