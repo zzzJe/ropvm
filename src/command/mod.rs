@@ -5,9 +5,8 @@ mod style;
 pub use handler::command_handler;
 
 #[derive(Parser)]
-#[command(name = "opvm")]
-#[command(version = "0.1.0")]
-#[command(about = "Optifine version manager", long_about = None)]
+#[command(bin_name = env!("CARGO_PKG_NAME"))]
+#[command(version, about, long_about = None)]
 #[command(styles = style::CLAP_STYLING)]
 pub struct Cli {
     #[command(subcommand)]

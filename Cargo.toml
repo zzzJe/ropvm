@@ -1,6 +1,7 @@
 [package]
 name = "opvm"
 version = "0.1.0"
+description = "Optifine version manager"
 edition = "2021"
 
 [dependencies]

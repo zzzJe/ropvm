@@ -85,31 +85,19 @@ pub(super) async fn handler(
 
             tasks.push(tokio::spawn(async move {
                 println!("⭐ opvm config scaffolding ⭐");
-                print!("👉 --minecraft-dir: ");
-                let mut input = String::new();
-                std::io::stdout().flush().unwrap();
-                std::io::stdin().read_line(&mut input).unwrap();
-                let input = input.trim().to_string();
+                let input = read_line("👉 --minecraft-dir: ");
                 if config_mc_dir(db.clone(), &input).is_ok() {
                     println!("✅ set to '{input}'");
                 } else {
                     println!("❌ Failed to config minecraft-dir")
                 }
-                print!("👉 --java-path: ");
-                let mut input = String::new();
-                std::io::stdout().flush().unwrap();
-                std::io::stdin().read_line(&mut input).unwrap();
-                let input = input.trim().to_string();
+                let input = read_line("👉 --java-path: ");
                 if config_java(db.clone(), &input).is_ok() {
                     println!("✅ set to '{input}'");
                 } else {
                     println!("❌ Failed to config java-path")
                 }
-                print!("👉 --repo-dir: ");
-                let mut input = String::new();
-                std::io::stdout().flush().unwrap();
-                std::io::stdin().read_line(&mut input).unwrap();
-                let input = input.trim().to_string();
+                let input = read_line("👉 --repo-dir: ");
                 if config_repo(db.clone(), &input).is_ok() {
                     println!("✅ set to '{input}'");
                 } else {
@@ -120,6 +108,14 @@ pub(super) async fn handler(
     }
     let _results = futures::future::join_all(tasks).await;
     db.flush_async().await.expect("Database flush failed");
+}
+
+fn read_line(print: &str) -> String {
+    let mut input = String::new();
+    print!("{print}");
+    std::io::stdout().flush().unwrap();
+    std::io::stdin().read_line(&mut input).unwrap();
+    input.trim().to_string()
 }
 
 fn config_mc_dir(db: Tree, mc_dir: &String) -> db::Result<()> {
