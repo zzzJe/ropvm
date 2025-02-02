@@ -1,7 +1,7 @@
 <center>
-    <h1>OPVM</h1>
-    <h3>Your Ultimate OptiFine Version Manager</h3>
-    <p>Effortlessly Download, Apply, and Manage OptiFine Versions for an Enhanced Minecraft Experience</p>
+    <h1 align="center">OPVM</h1>
+    <h3 align="center">Your Ultimate OptiFine Version Manager</h3>
+    <p align="center">Effortlessly Download, Apply, and Manage OptiFine Versions for an Enhanced Minecraft Experience</p>
 </center>
 
 ![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)
