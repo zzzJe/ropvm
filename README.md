@@ -7,7 +7,7 @@
 ![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Platform Support](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-blue)
 ![Status](https://img.shields.io/badge/status-stable-brightgreen)
-![Build Status](https://img.shields.io/github/actions/workflow/status/zzzJe/ropvm/build-and-release.yml)
+![Build Status](https://github.com/zzzJe/ropvm/actions/workflows/build-and-release.yml/badge.svg)
 
 ### Introduction
 
