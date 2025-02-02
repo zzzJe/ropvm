@@ -27,9 +27,10 @@ Getting started is easy—just follow the [installation guide](#installation) an
 ### Installation
 
 1. Go to [release page](https://github.com/zzzje/ropvm/releases/latest), and download the appropriate binary for your platform
-2. Place the binary in a **dedicated folder**
-3. Add the folder to your system's `PATH` environment variable (`path/to/your/dedicated/folder`)
-4. You're all set! Run `opvm --version` to verify the installation
+2. Rename the downloaded binary as `opvm` (or `opvm.exe` on Windows)
+3. Place the binary in a **dedicated folder**
+4. Add the folder to your system's `PATH` environment variable (`path/to/your/dedicated/folder`)
+5. You're all set! Run `opvm --version` to verify the installation
 
 ### Usages
 
