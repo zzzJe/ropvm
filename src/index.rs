@@ -57,7 +57,7 @@ pub fn parse(raw_index: &str, boundary: usize) -> (Vec<ParsedRange>, Vec<(String
                 (Ok(n1), Ok(n2)) => ParsedRange::Inclusive(n1, n2),
             }
         } else {
-            ParsedRange::Invalid(index, format!("Syntax error"))
+            ParsedRange::Invalid(index, "Syntax error".to_string())
         };
         if let ParsedRange::Invalid(raw, reason) = result {
             invalid_index.push((raw.to_string(), reason));

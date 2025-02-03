@@ -34,7 +34,7 @@ pub(super) async fn handler(version: Option<String>) {
             for ver in row {
                 print!("   {:<6}", ver);
             }
-            print!("\n");
+            println!();
         }
     }
 }
@@ -42,7 +42,7 @@ pub(super) async fn handler(version: Option<String>) {
 fn transpose<T: Clone>(matrix: &Vec<Vec<T>>) -> Vec<Vec<T>> {
     let mut transposed = vec![Vec::with_capacity(matrix.len()); matrix[0].len()];
     for row in matrix {
-        for (j, val) in row.into_iter().enumerate() {
+        for (j, val) in row.iter().enumerate() {
             transposed[j].push(val.clone());
         }
     }

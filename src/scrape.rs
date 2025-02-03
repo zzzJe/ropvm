@@ -69,11 +69,11 @@ impl Scraper {
         //   -> tr (footer)
         // The ".content span.downloads h2" is a path to mc vers manifest
         if self.mc_ver.borrow().is_none() {
-            const SELECTOR_PATTERN: &'static str = ".content span.downloads h2";
+            const SELECTOR_PATTERN: &str = ".content span.downloads h2";
             let selector = Selector::parse(SELECTOR_PATTERN).unwrap();
             // The mc vers are represented as "Minecraft a.b.c"
             // So here simply just remove "Minecraft " padding
-            const VER_PAD_PATTERN: &'static str = "Minecraft ";
+            const VER_PAD_PATTERN: &str = "Minecraft ";
             let result = self
                 .dom
                 .select(&selector)
@@ -86,8 +86,7 @@ impl Scraper {
     }
     pub fn get_all_opt_vers(&self) -> &IndexSet<String> {
         if self.opt_all_ver.borrow().is_none() {
-            const SELECTOR_PATTERN: &'static str =
-                "table.downloadTable tr.downloadLine td.colMirror a";
+            const SELECTOR_PATTERN: &str = "table.downloadTable tr.downloadLine td.colMirror a";
             let selector = Selector::parse(SELECTOR_PATTERN).unwrap();
             // Note that we use `.unwrap()` all the way
             // If the file name structure changed, this will cause the cli to crash directly
@@ -139,7 +138,7 @@ impl Scraper {
         );
         let html_text = reqwest::get(url).await?.text().await?;
         let dom = Html::parse_document(&html_text);
-        const SELECTOR_PATTERN: &'static str = "table.tableDownload span#Download a";
+        const SELECTOR_PATTERN: &str = "table.tableDownload span#Download a";
         let selector = Selector::parse(SELECTOR_PATTERN).unwrap();
         let stream = dom
             .select(&selector)

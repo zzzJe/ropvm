@@ -33,9 +33,9 @@ pub(super) async fn handler(version: String) {
                 .collect();
             let mut vers = sort_vers(vers_unsorted, &cache_db, ListSortBy::NameNew);
             let (parsed_valid_index, parsed_invalid_index) = parse(&index, vers.len());
-            match (parsed_valid_index.get(0), parsed_invalid_index) {
+            match (parsed_valid_index.first(), parsed_invalid_index) {
                 (Some(ParsedRange::Single(i)), invalid)
-                    if vers.len() > 0 && invalid.is_empty() && parsed_valid_index.len() == 1 =>
+                    if !vers.is_empty() && invalid.is_empty() && parsed_valid_index.len() == 1 =>
                 {
                     Some(vers.swap_remove(*i - 1).0)
                 }
@@ -120,7 +120,7 @@ async fn invoke_gui_and_check(conf_db: &Tree, ver: &str) -> Result<(), InvokeErr
         _ => Ok(()),
     }?;
 
-    status.success().then(|| ()).ok_or(InvokeError::ExitFail)
+    status.success().then_some(()).ok_or(InvokeError::ExitFail)
 }
 
 async fn get_launcher_profile(launcher_profile_path: &Path) -> Result<String, InvokeError> {

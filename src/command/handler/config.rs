@@ -10,7 +10,7 @@ use tokio::{
     process::Command,
 };
 
-const TEST_JAR: &'static [u8] = include_bytes!("../../../test_resources/java/Test.jar");
+const TEST_JAR: &[u8] = include_bytes!("../../../test_resources/java/Test.jar");
 
 pub(super) async fn handler(
     minecraft_dir: Option<String>,
@@ -131,12 +131,12 @@ async fn test_mc_dir(db: Tree) -> Result<String, String> {
     let entry = db.get("mc_dir").unwrap();
     // 1. test if entry exists
     if entry.is_none() {
-        return Err(format!("🛑 minecraft-dir has not been configured yet"));
+        return Err("🛑 minecraft-dir has not been configured yet".to_string());
     }
     // 2. test if entry is a valid dir
     let path_string = ivec_to_string(entry.as_ref().unwrap());
     let path = Path::new(&path_string);
-    if !is_readable_dir(&path).await {
+    if !is_readable_dir(path).await {
         return Err(format!(
             "🛑 The path '{path_string}' is not a readable directory"
         ));
@@ -193,8 +193,8 @@ async fn test_java(db: Tree) -> Result<String, String> {
     } else {
         let status = open_process_to_test_java("java").await;
         match status {
-            Ok(Ok(exit)) if exit.success() => Ok(format!("✅ java-path: default (javaw)")),
-            _ => Err(format!("🛑 No avaliable javaw machine be found")),
+            Ok(Ok(exit)) if exit.success() => Ok("✅ java-path: default (javaw)".to_string()),
+            _ => Err("🛑 No avaliable javaw machine be found".to_string()),
         }
     }
 }

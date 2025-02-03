@@ -64,9 +64,11 @@ pub(super) async fn handler(versions: Vec<String>) {
         match result {
             Ok(_) => {
                 let current_time = get_current_time();
-                ver_db.insert(&opt_ver, &current_time[..]).expect(&format!(
-                    "Failed to insert Optifine version {opt_ver} into datebase"
-                ));
+                ver_db
+                    .insert(&opt_ver, &current_time[..])
+                    .unwrap_or_else(|_| {
+                        panic!("Failed to insert Optifine version {opt_ver} into datebase")
+                    });
                 println!(
                     "✅ {opt_ver} {} success!",
                     ".".repeat(max_ver_len - opt_ver.len() + 3)
