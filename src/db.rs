@@ -9,7 +9,10 @@ pub struct Database {
 
 impl Database {
     pub fn new() -> Self {
-        let db = sled::open(".db").expect("Failed to open database");
+        let root_dir = std::env::var("OPVM_HOME").expect("Failed to read `OPVM_HOME` variable");
+        let db_path = std::path::Path::new(&root_dir).join(".db");
+
+        let db = sled::open(&db_path).expect("Failed to open database");
         let config_tree = db
             .open_tree("config")
             .expect("Failed to open database:config");

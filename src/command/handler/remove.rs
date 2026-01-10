@@ -31,10 +31,12 @@ pub(super) async fn handler(patterns: Vec<String>) {
         }
     }
     let max_display_len = to_delete.iter().map(|s| s.len()).max().unwrap();
-    let base_path = match conf_db.get("repo_dir").unwrap() {
-        Some(ivec) => ivec_to_string(&ivec),
-        None => "repo".to_string(),
-    };
+
+    let base_path = conf_db.get("repo_dir")
+        .unwrap()
+        .map(|ivec| ivec_to_string(&ivec))
+        .unwrap();
+
     let base_path = Arc::new(base_path);
     let futures = to_delete
         .into_iter()

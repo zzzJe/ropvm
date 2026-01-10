@@ -6,10 +6,13 @@ use tokio::fs;
 pub(super) async fn handler() {
     let db = Database::new();
     let conf_db = db.get_config_db();
-    let repo_path = match conf_db.get("repo_dir").unwrap() {
-        Some(ivec) => ivec_to_string(&ivec),
-        None => "repo".to_string(),
-    };
+
+    let repo_path = conf_db.get("repo_dir")
+        .unwrap()
+        .map(|ivec| ivec_to_string(&ivec))
+        .filter(|s| !s.is_empty())
+        .unwrap();
+
     let existed_jars = get_exised_jars(&repo_path).await;
     let ver_db = db.get_version_db();
     match sync_vec_to_db(ver_db, existed_jars) {

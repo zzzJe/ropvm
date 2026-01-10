@@ -1,7 +1,7 @@
 use crate::db::{self, ivec_to_string, Database, Tree};
 use std::{
     io::Write,
-    path::Path,
+    path::{Path, PathBuf},
     process::{ExitStatus, Stdio},
 };
 use tokio::{
@@ -178,20 +178,22 @@ fn config_java(db: Tree, java_path: &String) -> db::Result<()> {
 
 async fn test_java(db: Tree) -> Result<String, String> {
     let entry = db.get("java_path").unwrap();
+    let root_dir = std::env::var("OPVM_HOME").expect("Failed to read `OPVM_HOME` variable");
+    let test_dir = std::path::Path::new(&root_dir).join(".test_resources");
 
-    create_test_jar_and_dir_if_not_exist()
+    create_test_jar_and_dir_if_not_exist(&test_dir)
         .await
         .map_err(|_| "Failed to create .test_resources/Test.jar".to_string())?;
 
     if let Some(java) = entry {
         let java = ivec_to_string(&java);
-        let status = open_process_to_test_java(&java).await;
+        let status = open_process_to_test_java(&java, &test_dir).await;
         match status {
             Ok(Ok(exit)) if exit.success() => Ok(format!("✅ java-path: '{java}'")),
             _ => Err(format!("🛑 Given java-path '{java}' is invalid")),
         }
     } else {
-        let status = open_process_to_test_java("java").await;
+        let status = open_process_to_test_java("java", &test_dir).await;
         match status {
             Ok(Ok(exit)) if exit.success() => Ok("✅ java-path: default (javaw)".to_string()),
             _ => Err("🛑 No avaliable javaw machine be found".to_string()),
@@ -199,19 +201,20 @@ async fn test_java(db: Tree) -> Result<String, String> {
     }
 }
 
-async fn create_test_jar_and_dir_if_not_exist() -> Result<(), std::io::Error> {
-    let filepath = Path::new(".test_resources/Test.jar");
-    fs::create_dir_all(".test_resources").await?;
-    if !filepath.exists() {
-        fs::write(filepath, TEST_JAR).await?;
+async fn create_test_jar_and_dir_if_not_exist(test_dir: &PathBuf) -> Result<(), std::io::Error> {
+    fs::create_dir_all(&test_dir).await?;
+    if !test_dir.join("Test.jar").exists() {
+        fs::write(test_dir, TEST_JAR).await?;
     }
     Ok(())
 }
 
-async fn open_process_to_test_java(java: &str) -> Result<Result<ExitStatus, ()>, std::io::Error> {
+async fn open_process_to_test_java(java: &str, test_dir: &PathBuf) -> Result<Result<ExitStatus, ()>, std::io::Error> {
+    let jar_file = test_dir.join("Test.jar");
+
     let mut child = Command::new(java)
         .arg("-jar")
-        .arg(".test_resources/Test.jar")
+        .arg(jar_file.as_os_str())
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()?;
