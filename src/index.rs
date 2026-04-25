@@ -11,7 +11,7 @@ pub enum ParsedRange<'a> {
     Invalid(&'a str, String),
 }
 
-pub fn parse(raw_index: &str, boundary: usize) -> (Vec<ParsedRange>, Vec<(String, String)>) {
+pub fn parse(raw_index: &str, boundary: usize) -> (Vec<ParsedRange<'_>>, Vec<(String, String)>) {
     let mut valid_index = Vec::new();
     let mut invalid_index = Vec::new();
 

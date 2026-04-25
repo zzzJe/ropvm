@@ -203,8 +203,10 @@ async fn test_java(db: Tree) -> Result<String, String> {
 
 async fn create_test_jar_and_dir_if_not_exist(test_dir: &PathBuf) -> Result<(), std::io::Error> {
     fs::create_dir_all(&test_dir).await?;
-    if !test_dir.join("Test.jar").exists() {
-        fs::write(test_dir, TEST_JAR).await?;
+    let file_path = PathBuf::from(test_dir).join("Test.jar");
+    println!("{file_path:?}");
+    if !file_path.exists() {
+        fs::write(file_path, TEST_JAR).await?;
     }
     Ok(())
 }
