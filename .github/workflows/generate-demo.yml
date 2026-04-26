@@ -6,6 +6,10 @@ on:
 permissions:
   contents: write
 
+env:
+  CARGO_INCREMENTAL: 0
+  OPVM_HOME: ${{ github.workspace }}
+
 jobs:
   vhs:
     runs-on: ubuntu-latest
@@ -13,6 +17,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Install Fonts
+        run: |
+          sudo mkdir -p /usr/share/fonts/truetype/nerdfont
+
+          curl -L https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip -o JB.zip
+          sudo unzip -o JB.zip -d /usr/share/fonts/truetype/nerdfont
+
+          sudo fc-cache -fv
 
       - name: Install System Dependencies
         run: |
@@ -26,10 +39,10 @@ jobs:
           echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
           sudo apt-get update && sudo apt-get install -y vhs
 
-          mkdir -p ~/.local/share/fonts
-          curl -L https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip -o Meslo.zip
-          unzip -o Meslo.zip -d ~/.local/share/fonts
-          fc-cache -fv
+          # mkdir -p ~/.local/share/fonts
+          # curl -L https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip -o Meslo.zip
+          # unzip -o Meslo.zip -d ~/.local/share/fonts
+          # fc-cache -fv
 
       - uses: dtolnay/rust-toolchain@stable
       - name: Build opvm
@@ -47,10 +60,10 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
-          BRANCH_NAME="vhs-demo-update"
+
+          BRANCH_NAME="vhs-demo-generate"
           git checkout -b $BRANCH_NAME || git checkout $BRANCH_NAME
-          
+
           git add assets/demo.gif
           git commit -m "docs: manual update demo video" || echo "No changes to commit"
           git push origin $BRANCH_NAME --force
