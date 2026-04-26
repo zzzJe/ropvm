@@ -18,6 +18,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Fonts
+        run: |
+          sudo mkdir -p /usr/share/fonts/truetype/nerdfont
+
+          curl -L https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip -o JB.zip
+          sudo unzip -o JB.zip -d /usr/share/fonts/truetype/nerdfont
+
+          sudo fc-cache -fv
+
       - name: Install System Dependencies
         run: |
           sudo apt-get update
@@ -29,10 +38,6 @@ jobs:
           curl -sL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
           echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
           sudo apt-get update && sudo apt-get install -y vhs
-
-          curl -L https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip -o JB.zip
-          unzip -o JB.zip -d ~/.local/share/fonts
-          fc-cache -fv
 
           # mkdir -p ~/.local/share/fonts
           # curl -L https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip -o Meslo.zip
