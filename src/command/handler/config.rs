@@ -19,14 +19,14 @@ pub(super) async fn handler(
     test: bool,
 ) {
     let scaffolding = minecraft_dir.is_none() && java_path.is_none() && repo_dir.is_none();
-    let db = Database::new().get_config_db();
+    let db = Database::new();
 
     let mut tasks = vec![];
 
     if let Some(mc_dir) = minecraft_dir {
         let db = db.clone();
         tasks.push(tokio::spawn(async move {
-            if config_mc_dir(db.clone(), &mc_dir).is_err() {
+            if config_mc_dir(db.get_config_db(), &mc_dir).is_err() {
                 println!("❌ Failed to config minecraft-dir");
             } else if test {
                 match test_mc_dir(db.clone()).await {
@@ -39,7 +39,7 @@ pub(super) async fn handler(
     if let Some(java_path) = java_path {
         let db = db.clone();
         tasks.push(tokio::spawn(async move {
-            if config_java(db.clone(), &java_path).is_err() {
+            if config_java(db.get_config_db(), &java_path).is_err() {
                 println!("❌ Failed to config java-path");
             } else if test {
                 match test_java(db.clone()).await {
@@ -52,7 +52,7 @@ pub(super) async fn handler(
     if let Some(repo) = repo_dir {
         let db = db.clone();
         tasks.push(tokio::spawn(async move {
-            if config_repo(db.clone(), &repo).is_err() {
+            if config_repo(db.get_config_db(), &repo).is_err() {
                 println!("❌ Failed to config repo-dir")
             } else if test {
                 match test_repo(db.clone()).await {
@@ -66,9 +66,9 @@ pub(super) async fn handler(
         if test {
             let db = db.clone();
 
-            async fn judge<F, Fut>(db: Tree, f: F)
+            async fn judge<F, Fut>(db: Database, f: F)
             where
-                F: Fn(Tree) -> Fut,
+                F: Fn(Database) -> Fut,
                 Fut: std::future::Future<Output = Result<String, String>>,
             {
                 match f(db.clone()).await {
@@ -86,19 +86,19 @@ pub(super) async fn handler(
             tasks.push(tokio::spawn(async move {
                 println!("⭐ opvm config scaffolding ⭐");
                 let input = read_line("👉 --minecraft-dir: ");
-                if config_mc_dir(db.clone(), &input).is_ok() {
+                if config_mc_dir(db.get_config_db(), &input).is_ok() {
                     println!("✅ set to '{input}'");
                 } else {
                     println!("❌ Failed to config minecraft-dir")
                 }
                 let input = read_line("👉 --java-path: ");
-                if config_java(db.clone(), &input).is_ok() {
+                if config_java(db.get_config_db(), &input).is_ok() {
                     println!("✅ set to '{input}'");
                 } else {
                     println!("❌ Failed to config java-path")
                 }
                 let input = read_line("👉 --repo-dir: ");
-                if config_repo(db.clone(), &input).is_ok() {
+                if config_repo(db.get_config_db(), &input).is_ok() {
                     println!("✅ set to '{input}'");
                 } else {
                     println!("❌ Failed to config repo-dir")
@@ -107,7 +107,7 @@ pub(super) async fn handler(
         }
     }
     let _results = futures::future::join_all(tasks).await;
-    db.flush_async().await.expect("Database flush failed");
+    db.get_config_db().flush_async().await.expect("Database flush failed");
 }
 
 fn read_line(print: &str) -> String {
@@ -127,8 +127,8 @@ fn config_mc_dir(db: Tree, mc_dir: &String) -> db::Result<()> {
     Ok(())
 }
 
-async fn test_mc_dir(db: Tree) -> Result<String, String> {
-    let entry = db.get("mc_dir").unwrap();
+async fn test_mc_dir(db: Database) -> Result<String, String> {
+    let entry = db.get_config_db().get("mc_dir").unwrap();
     // 1. test if entry exists
     if entry.is_none() {
         return Err("🛑 minecraft-dir has not been configured yet".to_string());
@@ -176,8 +176,8 @@ fn config_java(db: Tree, java_path: &String) -> db::Result<()> {
     Ok(())
 }
 
-async fn test_java(db: Tree) -> Result<String, String> {
-    let entry = db.get("java_path").unwrap();
+async fn test_java(db: Database) -> Result<String, String> {
+    let entry = db.get_config_db().get("java_path").unwrap();
     let root_dir = std::env::var("OPVM_HOME").expect("Failed to read `OPVM_HOME` variable");
     let test_dir = std::path::Path::new(&root_dir).join(".test_resources");
 
@@ -204,7 +204,7 @@ async fn test_java(db: Tree) -> Result<String, String> {
 async fn create_test_jar_and_dir_if_not_exist(test_dir: &PathBuf) -> Result<(), std::io::Error> {
     fs::create_dir_all(&test_dir).await?;
     let file_path = PathBuf::from(test_dir).join("Test.jar");
-    println!("{file_path:?}");
+    // println!("{file_path:?}");
     if !file_path.exists() {
         fs::write(file_path, TEST_JAR).await?;
     }
@@ -248,29 +248,19 @@ fn config_repo(db: Tree, repo_dir: &String) -> db::Result<()> {
     Ok(())
 }
 
-async fn test_repo(db: Tree) -> Result<String, String> {
-    let entry = db.get("repo_dir").unwrap();
+async fn test_repo(db: Database) -> Result<String, String> {
+    let repo_dir = db.get_repo_dir();
 
-    if let Some(repo) = entry {
-        let repo_string = ivec_to_string(&repo);
-        let repo = Path::new(&repo_string);
+    if let Some(repo_str) = repo_dir {
+        let repo_path = Path::new(&repo_str);
 
-        if is_readable_dir(repo).await && is_writable_dir(repo).await {
-            Ok(format!("✅ repo-dir: '{repo_string}'"))
+        if is_readable_dir(repo_path).await && is_writable_dir(repo_path).await {
+            Ok(format!("✅ repo-dir: '{repo_str}'"))
         } else {
-            Err(format!("🛑 Given repo-dir '{repo_string}' is invalid"))
+            Err(format!("🛑 Given repo-dir '{repo_str}' is invalid"))
         }
     } else {
-        // automaticall create nessasary parent directory
-        let repo_dir = Path::new("repo");
-        tokio::fs::create_dir_all(repo_dir)
-            .await
-            .map_err(|_| "❌ Failed to create default repo directory")?;
-        if is_writable_dir(repo_dir).await {
-            Ok("✅ repo-dir: default (repo/)".to_string())
-        } else {
-            Err("🛑 Cannot add/remove file at default local repo".to_string())
-        }
+        Err("🛑 Neither repo directory or OPVM_HOME is set".to_string())
     }
 }
 

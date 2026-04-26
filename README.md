@@ -34,19 +34,21 @@ Getting started is easy—just follow the [installation guide](#installation) an
 
 ### Usages
 
-🌐 To search available Minecraft/Optifine versions:
+To search available Minecraft/Optifine versions:
 ```sh
 # List available Minecraft versions
 opvm search
-
+```
+```sh
 # List available Optifine versions for Minecraft 1.16.5
 opvm search 1.16.5
 ```
 
-🔰 Download one or more version(s):
+Download one or more version(s):
 ```sh
 opvm add 1.16.5
-
+```
+```sh
 # Support index syntax
 # index := [Range/Range/Range/...]
 # range := `from~to` or `~to` or `from~` or `~` or `single indice`
@@ -60,29 +62,41 @@ opvm add 1.16.5[1/2/3]
 opvm add 1.16.5[1~3]
 opvm add 1.16.5[1/2~3]
 opvm add 1.16.5[~]
-
+```
+```sh
 # Download multiple version
 opvm add 1.16.5[~] 1.21.4 1.8.9
 ```
 
-🔷 List downloaded version(s)
+List downloaded version(s)
 ```sh
 opvm list
+```
+```sh
 # with time stamp
 opvm list --time
 ```
-🔨 Config the tool
+
+Config the tool
 ```sh
 opvm config
+```
+```sh
 # test config integrity
 opvm config --test
 ```
 
-🚩 Use the downloaded version
+Use the downloaded version
 ```sh
 opvm apply [PATTERN]
+```
+```sh
 opvm apply 1.16.5
+```
+```sh
 opvm apply 1.16.5_
+```
+```sh
 opvm apply 1.16.5_HD_U_G8
 ```
 

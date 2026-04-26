@@ -1,6 +1,6 @@
 use super::util::get_current_time;
 use crate::{
-    db::{ivec_to_string, Database, Tree},
+    db::{Database, Tree},
     index::{destruct_input, parse, purify},
     scrape::Scraper,
 };
@@ -15,7 +15,6 @@ pub(super) async fn handler(versions: Vec<String>) {
     let scrap = Scraper::new().await;
     let db = Database::new();
     let ver_db = db.get_version_db();
-    let conf_db = db.get_config_db();
     let cache_db = db.get_cache_db();
 
     let mut to_download = IndexSet::new();
@@ -49,16 +48,11 @@ pub(super) async fn handler(versions: Vec<String>) {
 
     async fn download(
         ver_db: Tree,
-        conf_db: Tree,
+        repo_dir: String,
         opt_ver: String,
         max_ver_len: usize,
     ) -> Result<(), ()> {
-        let out_path = conf_db.get("repo_dir")
-            .unwrap()
-            .map(|ivec| ivec_to_string(&ivec))
-            .filter(|s| !s.is_empty())
-            .map(|s| Path::new(&s).join(format!("{opt_ver}.jar")))
-            .unwrap();
+        let out_path = Path::new(&repo_dir).join(format!("{opt_ver}.jar"));
 
         let result = Scraper::download_opt_file(&opt_ver, &out_path).await;
         match result {
@@ -105,7 +99,7 @@ pub(super) async fn handler(versions: Vec<String>) {
         .map(|opt_ver| {
             tokio::spawn(download(
                 ver_db.clone(),
-                conf_db.clone(),
+                db.get_repo_dir_unwrap(),
                 opt_ver,
                 max_ver_len.unwrap(),
             ))

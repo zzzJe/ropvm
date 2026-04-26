@@ -8,7 +8,6 @@ pub(super) async fn handler(patterns: Vec<String>) {
     }
     let db = Database::new();
     let ver_db = db.get_version_db();
-    let conf_db = db.get_config_db();
     let current_files: Vec<String> = ver_db
         .iter()
         .map(|e| e.expect("Failed to get version from db"))
@@ -32,10 +31,7 @@ pub(super) async fn handler(patterns: Vec<String>) {
     }
     let max_display_len = to_delete.iter().map(|s| s.len()).max().unwrap();
 
-    let base_path = conf_db.get("repo_dir")
-        .unwrap()
-        .map(|ivec| ivec_to_string(&ivec))
-        .unwrap();
+    let base_path = db.get_repo_dir_unwrap();
 
     let base_path = Arc::new(base_path);
     let futures = to_delete

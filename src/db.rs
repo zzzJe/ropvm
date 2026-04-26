@@ -1,6 +1,8 @@
+use std::env;
 use sled::IVec;
 pub use sled::{Result, Tree};
 
+#[derive(Clone)]
 pub struct Database {
     config: Tree,
     version: Tree,
@@ -36,6 +38,19 @@ impl Database {
     }
     pub fn get_cache_db(&self) -> Tree {
         self.cache.clone()
+    }
+    pub fn get_repo_dir(&self) -> Option<String> {
+        let out_path = self
+            .get_config_db()
+            .get("repo_dir")
+            .unwrap()
+            .map(|v| ivec_to_string(&v))
+            .filter(|s| !s.is_empty())
+            .or_else(|| env::var("OPVM_HOME").ok());
+        out_path
+    }
+    pub fn get_repo_dir_unwrap(&self) -> String {
+        self.get_repo_dir().expect("Neither repo_dir nor OPVM_HOME is set")
     }
 }
 

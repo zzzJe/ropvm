@@ -1,6 +1,6 @@
 use super::{util::sort_vers, ListSortBy};
 use crate::{
-    db::{ivec_to_string, Database, Tree},
+    db::{ivec_to_string, Database},
     index::{destruct_input, parse, ParsedRange},
 };
 use regex::Regex;
@@ -18,7 +18,6 @@ enum InvokeError {
 pub(super) async fn handler(version: String) {
     let db = Database::new();
     let ver_db = db.get_version_db();
-    let conf_db = db.get_config_db();
     let cache_db = db.get_cache_db();
 
     let to_apply = match destruct_input(&version) {
@@ -56,7 +55,7 @@ pub(super) async fn handler(version: String) {
     };
     match to_apply {
         Some(ver) => {
-            let result = invoke_gui_and_check(&conf_db, &ver).await;
+            let result = invoke_gui_and_check(&db, &ver).await;
             if let Err(err) = result {
                 println!("🛑 {ver} failed to apply!");
                 let reason = match err {
@@ -80,24 +79,22 @@ pub(super) async fn handler(version: String) {
     }
 }
 
-async fn invoke_gui_and_check(conf_db: &Tree, ver: &str) -> Result<(), InvokeError> {
+async fn invoke_gui_and_check(db: &Database, ver: &str) -> Result<(), InvokeError> {
     let ver = format!("{ver}.jar");
-    let mc_dir = conf_db
+    let mc_dir = db
+        .get_config_db()
         .get("mc_dir")
         .unwrap()
         .map(|ivec| ivec_to_string(&ivec))
         .ok_or(InvokeError::McDirNotFound)?;
     let launcher_profile_path = Path::new(&mc_dir).join("launcher_profiles.json");
-    let java = conf_db
+    let java = db
+        .get_config_db()
         .get("java_path")
         .unwrap()
         .map(|ivec| ivec_to_string(&ivec))
         .unwrap_or("javaw".to_string());
-    let repo = conf_db
-        .get("repo_dir")
-        .unwrap()
-        .map(|ivec| ivec_to_string(&ivec))
-        .unwrap_or("repo".to_string());
+    let repo = db.get_repo_dir_unwrap();
     let path = Path::new(&repo).join(ver);
 
     let profile_before = get_launcher_profile(&launcher_profile_path).await?;
