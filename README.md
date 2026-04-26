@@ -11,6 +11,8 @@
 
 ### Introduction
 
+<img alt="Welcome to OPVM" src="https://raw.githubusercontent.com/zzzJe/ropvm/vhs-demo-generate/assets/demo.gif" width="600" />
+
 OPVM is a command-line tool designed to simplify the management of OptiFine files. It allows you to search, download, and manage OptiFine versions effortlessly—all without ads.
 
 Whether you're a casual Minecraft player, or a mod developer, OPVM provides a clean and efficient way to handle OptiFine versions. The source code is open and available on GitHub, so if you have any security concerns, feel free to review it.
@@ -30,11 +32,19 @@ Getting started is easy—just follow the [installation guide](#installation) an
 2. Rename the downloaded binary as `opvm` (or `opvm.exe` on Windows)
 3. Place the binary in a **dedicated folder**
 4. Add the folder to your system's `PATH` environment variable (`path/to/your/dedicated/folder`)
-5. You're all set! Run `opvm --version` to verify the installation
+5. Add environment variable `OPVM_HOME` as path to your **dedicated folder**
+6. Run `opvm --version` to verify the installation
+7. Run `opvm config` to config `opvm` parameters
+    - `--minecraft-dir` is mandatory, set to `path/to/.minecraft`
+    - `--java-path` can be left blank, which `opvm` will use `javew` in the environment
+    - `--repo-dir` can be left blank, which `opvm` will use `$OPVM_HOME/repo` dir
+8. Run `opvm config --test` to verify configuration
+9. You're all set! 🎉
 
 ### Usages
 
-To search available Minecraft/Optifine versions:
+#### Search available Minecraft/Optifine versions:
+
 ```sh
 # List available Minecraft versions
 opvm search
@@ -44,7 +54,8 @@ opvm search
 opvm search 1.16.5
 ```
 
-Download one or more version(s):
+#### Download one or more version(s):
+
 ```sh
 opvm add 1.16.5
 ```
@@ -68,7 +79,17 @@ opvm add 1.16.5[~]
 opvm add 1.16.5[~] 1.21.4 1.8.9
 ```
 
-List downloaded version(s)
+#### Remove one or more version(s):
+
+```sh
+opvm remove 1.16.5
+```
+```sh
+opvm remove 1.16.5_HD_U_G8
+```
+
+#### List downloaded version(s)
+
 ```sh
 opvm list
 ```
@@ -77,7 +98,8 @@ opvm list
 opvm list --time
 ```
 
-Config the tool
+#### Config the tool
+
 ```sh
 opvm config
 ```
@@ -86,11 +108,10 @@ opvm config
 opvm config --test
 ```
 
-Use the downloaded version
+#### Use the downloaded version
+
 ```sh
-opvm apply [PATTERN]
-```
-```sh
+# opvm apply [PATTERN]
 opvm apply 1.16.5
 ```
 ```sh
@@ -100,8 +121,33 @@ opvm apply 1.16.5_
 opvm apply 1.16.5_HD_U_G8
 ```
 
+#### Load files inside repo dir to database
+
+Usually needed after you manually change contents inside `repo_dir`
+
+```sh
+opvm load
+```
+
 ### Compatibility
 
-OPVM supports all platforms and architectures as long as `cargo` is able to build for that platform.
+OPVM is cross-platform and supports any environment where the Rust toolchain can be installed.
 
-The binaries available on the [release page](https://github.com/zzzje/ropvm/releases/latest) are currently built for the `x86_64` architecture only. If you need to use OPVM on other architectures, you can download the source code and run `cargo build --release` to compile the tool yourself.
+#### Pre-built Binaries
+
+We provide **different versions** on our [release page](https://github.com/zzzje/ropvm/releases/latest) covering major operating systems and architectures. Please choose the one that matches your environment.
+
+| OS      | Architecture             | Target Triple                |
+| :------ | :----------------------- | :--------------------------- |
+| macOS   | Apple Silicon            | aarch64-apple-darwin         |
+| macOS   | Intel 64-bit             | x86_64-apple-darwin          |
+| Linux   | ARM 64-bit               | aarch64-unknown-linux-gnu    |
+| Linux   | Intel/AMD 64-bit         | x86_64-unknown-linux-gnu     |
+| Windows | Intel/AMD 64-bit         | x86_64-pc-windows-msvc       |
+
+#### Custom Build
+
+If your specific platform is not listed in the releases, OPVM supports **all platforms and architectures** as long as `cargo` is able to build for them. You can simply compile it yourself using:
+```bash
+cargo build --release
+```
