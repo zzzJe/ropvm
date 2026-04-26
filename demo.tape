@@ -27,7 +27,12 @@ Sleep 500ms
 Enter
 Sleep 2s
 
-Type "opvm add 1.16.5[1] 1.20.1[~]"
+Type "opvm search 1.8.9"
+Sleep 500ms
+Enter
+Sleep 2s
+
+Type "opvm add 1.16.5[~] 1.20.1[~] 1.8.9[1~3/6]"
 Sleep 1s
 Enter
 Sleep 4s
@@ -37,8 +42,10 @@ Sleep 500ms
 Enter
 Sleep 2s
 
-Type "opvm remove 1.16.5[~]"
+Type "opvm remove 1.16.5"
 Sleep 500ms
+Enter
+Type "y"
 Enter
 Sleep 2s
 
@@ -46,8 +53,3 @@ Type "opvm list"
 Sleep 500ms
 Enter
 Sleep 2s
-
-Sleep 1s
-Type "exit"
-Enter
-Sleep 1s
