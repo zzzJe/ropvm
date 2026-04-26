@@ -1,0 +1,56 @@
+name: Generate Demo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vhs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip ffmpeg chromium-browser
+
+          sudo curl -L https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 -o /usr/local/bin/ttyd
+          sudo chmod +x /usr/local/bin/ttyd
+
+          curl -sL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
+          sudo apt-get update && sudo apt-get install -y vhs
+
+          mkdir -p ~/.local/share/fonts
+          curl -L https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip -o Meslo.zip
+          unzip -o Meslo.zip -d ~/.local/share/fonts
+          fc-cache -fv
+
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build opvm
+        run: cargo build --release
+
+      - name: Generate GIF with VHS
+        run: |
+          mkdir -p assets
+          export PATH="${{ github.workspace }}/target/release:$PATH"
+          vhs demo.tape
+        env:
+          BROWSER_PATH: /usr/bin/chromium-browser
+
+      - name: Push to branch
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          BRANCH_NAME="vhs-demo-update"
+          git checkout -b $BRANCH_NAME || git checkout $BRANCH_NAME
+          
+          git add assets/demo.gif
+          git commit -m "docs: manual update demo video" || echo "No changes to commit"
+          git push origin $BRANCH_NAME --force

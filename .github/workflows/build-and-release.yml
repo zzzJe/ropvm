@@ -1,4 +1,4 @@
-name: opvm_build
+name: OPVM Build
 run-name: build_${{ github.ref_name }}
 
 on:
