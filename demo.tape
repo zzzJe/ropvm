@@ -1,6 +1,6 @@
 Output assets/demo.gif
 Set Theme "Catppuccin Mocha"
-Set FontFamily "MesloLGS NF"
+Set FontFamily "JetBrainsMono NF"
 Set FontSize 22
 Set Width 1200
 Set Height 800
