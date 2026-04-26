@@ -61,7 +61,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          BRANCH_NAME="vhs-demo"
+          BRANCH_NAME="vhs-demo-generate"
           git checkout -b $BRANCH_NAME || git checkout $BRANCH_NAME
 
           git add assets/demo.gif
