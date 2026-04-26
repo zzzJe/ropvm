@@ -1,4 +1,7 @@
-use std::env;
+use std::{
+    env,
+    path::Path,
+};
 use sled::IVec;
 pub use sled::{Result, Tree};
 
@@ -46,7 +49,9 @@ impl Database {
             .unwrap()
             .map(|v| ivec_to_string(&v))
             .filter(|s| !s.is_empty())
-            .or_else(|| env::var("OPVM_HOME").ok());
+            .or_else(|| env::var("OPVM_HOME").ok())
+            .map(|s| Path::new(&s).join("repo").to_str().map(|s| s.to_string()))
+            .unwrap();
         out_path
     }
     pub fn get_repo_dir_unwrap(&self) -> String {
